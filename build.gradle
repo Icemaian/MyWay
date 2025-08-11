@@ -1,0 +1,45 @@
+plugins {
+	id 'groovy'
+  id 'java'
+  id 'application'
+	id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.swing']
+}
+
+repositories { mavenCentral() }
+
+def javafxVersion = '21.0.3'
+def osName = System.getProperty("os.name").toLowerCase()
+
+dependencies {
+	implementation(localGroovy())
+	// Duck db
+  implementation "org.duckdb:duckdb_jdbc:1.3.2.0"
+
+	// deck and leaflet alternative
+	implementation "com.gluonhq:maps:2.0.0-ea+6"
+
+	// junit 
+	testImplementation(platform('org.junit:junit-bom:5.13.4'))
+	testImplementation('org.junit.jupiter:junit-jupiter')
+	testRuntimeOnly('org.junit.platform:junit-platform-launcher')
+}
+
+application {
+  mainClass = "app.Main"
+	applicationDefaultJvmArgs = ["--add-modules=javafx.controls,javafx.swing", "-Dduckdb.tmpdir=build/duckdb-tmp"]
+}
+
+test {
+  useJUnitPlatform()
+	systemProperty "duckdb.tmpdir", "${project.buildDir}/duckdb-tmp"
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
+
